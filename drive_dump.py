@@ -55,6 +55,29 @@ def get_folder_and_files_total(directory):
 
     return files, folders
 
+def get_types_storage():
+    size_dict = {}
+    type_dict = {}
+    files = listdir(".")
+    for filename in files:
+        temp_path = path.join(".", filename)
+        if path.isdir(temp_path):
+            get_types_storage(temp_path)
+        elif path.isfile(temp_path):
+            type_name = path.splitext(temp_path)[1]
+            if not type_name:
+                type_dict.setdefault("None", 0)
+                type_dict["None"] += 1
+                size_dict.setdefault("None", 0)
+                size_dict["None"] += path.getsize(temp_path)
+            else:
+                type_dict.setdefault(type_name, 0)
+                type_dict[type_name] += 1
+                size_dict.setdefault(type_name, 0)
+                size_dict[type_name] += path.getsize(temp_path)
+    
+    return type_dict, size_dict
+
 # Returns a tuple of a disk's total, used, and free space.
 def get_disk_info(drive):
     try:
