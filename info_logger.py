@@ -27,3 +27,8 @@ def log_folders(folders):
         log_folder_info(folder_name, num_of_files, used) # Implement function
     log_total_folder_info(total_used) # Implement function
 
+# logging files' type and storage
+def log_fileTypeSize_info(type, size):
+    logging.debug('Logging the type of file and total storage')
+    for file in type.keys():
+        logging.info("{} {} {}", file, type[file], size[file])
