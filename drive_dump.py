@@ -1,5 +1,5 @@
 # PURP: - TO HANDLE DRIVE INFO LOGIC FOR -d and --drv arguments
-from os import listdir, walk, path
+from os import listdir, walk, path, stat
 from constants import *   
 from helper import format_size
 import logging
@@ -54,6 +54,37 @@ def get_folder_and_files_total(directory):
     # logging.debug('{:,} files, {:,} folders'.format(files, folders))
 
     return files, folders
+
+# return two dictionary about type and each storage.
+def get_types_storage():
+    size_dict = {}
+    type_dict = {}
+
+    try:
+        for drive in listdir('/Volumes/'):
+            for parent, dir_names, file_names in walk('/Volumes/' + drive, topdown=True):
+                for file_name in file_names:
+                    type_name = path.splitext(file_name)[-1]
+                    temp_path = path.join(parent, file_name)
+
+                    if path.isfile(temp_path):
+                        if not type_name:
+                            type_dict.setdefault("None", 0)
+                            type_dict["None"] += 1
+                            size_dict.setdefault("None", 0)
+                            size_dict["None"] += stat(temp_path).st_size
+                        else:
+                            type_dict.setdefault(type_name, 0)
+                            type_dict[type_name] += 1
+                            size_dict.setdefault(type_name, 0)
+                            size_dict[type_name] += stat(temp_path).st_size
+    except Exception:
+        logging.critical('Cannot list files from the OS structure')
+    if len(type_dict) < 0:
+        logging.error('the count of type cannot be negative' )
+    if len(size_dict) < 0:
+        logging.error('total sorage of files cannot be negative')
+    return type_dict, size_dict
 
 # Returns a tuple of a disk's total, used, and free space.
 def get_disk_info(drive):
